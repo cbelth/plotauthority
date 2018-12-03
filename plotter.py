@@ -44,6 +44,7 @@ class Plotter:
         self.plot(title=title, xscale=xscale, yscale=yscale)
         for values in values_list:
             plt.plot(sorted(values, reverse=True), color=self.color(color), alpha=alpha)
+        plt.show()
 
 
     def histogram(self,
@@ -55,4 +56,15 @@ class Plotter:
                   yscale=None):
         self.plot(title=title, xscale=xscale, yscale=yscale)
         plt.hist(values, color=self.color(color), alpha=alpha)
+        plt.show()
+
+    def loglog(self,
+               values,
+               title='log-log',
+               color=None,
+               alpha=1.,
+               xscale='symlog',
+               yscale='symlog'):
+        self.plot(title=title, xscale=xscale, yscale=yscale)
+        plt.plot(values, color=self.color(color), alpha=alpha)
         plt.show()
