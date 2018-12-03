@@ -16,6 +16,8 @@ class Plotter:
             plt.xscale(xscale)
         if yscale:
             plt.yscale(yscale)
+        plt.rcParams['axes.facecolor'] = (0.8588235294117647, 0.8588235294117647, 0.8588235294117647) 
+        plt.grid()
 
     def color(self, given_color):
         if given_color:
