@@ -66,5 +66,5 @@ class Plotter:
                xscale='symlog',
                yscale='symlog'):
         self.plot(title=title, xscale=xscale, yscale=yscale)
-        plt.plot(values, color=self.color(color), alpha=alpha)
+        plt.plot(sorted(values, reverse=True), 'o', color=self.color(color), alpha=alpha)
         plt.show()
