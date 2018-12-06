@@ -136,7 +136,7 @@ class Plotter:
         z_vals = xy_unique.values()
 
         ax = fig.add_subplot(1, 1, 1)
-        ax.grid(True, linestyle='-', color='0.75')
+        ax.grid() # TODO: ax.grid(True, linestyle='-', color='0.75'?)
         if z == 'heat': # plot density as heat map
             if not vmax:
                 vmax = np.max(z_vals) # make one heat color range to max density
