@@ -2,11 +2,17 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from color_theory import ColorTheory
 import numpy as np
+from theme import Theme
 
 class Plotter:
-    def __init__(self):
+    def __init__(self, theme=None):
+        if not theme:
+            self.theme = Theme() # default theme
         self.color_genie = ColorTheory()
         return
+
+    def set_theme(self, theme):
+        self.theme = theme
 
     def plot(self,
              title,
