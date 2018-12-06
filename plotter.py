@@ -36,6 +36,12 @@ class Plotter:
         plt.rcParams['axes.facecolor'] = background
         plt.grid()
 
+    def save(self, path):
+        if not path.endswith('.jpg'):
+            print('Path to save should end in .jpg')
+            return
+        plt.savefig(path, format='jpg', dpi=500)
+
     def color(self, given_color):
         if given_color:
             return given_color
@@ -45,6 +51,7 @@ class Plotter:
     def rank(self,
              values,
              title='Rank Plot',
+             save_path=None,
              color=None,
              alpha=1.,
              xscale='log',
@@ -56,11 +63,14 @@ class Plotter:
         '''
         self.plot(title=title, xscale=xscale, yscale=yscale)
         plt.plot(sorted(values, reverse=True), color=self.color(color), alpha=alpha)
+        if save_path:
+            self.save(save_path)
         plt.show()
 
     def multi_rank(self,
                    values_list,
                    title='Rank Plot',
+                   save_path=None,
                    color=None,
                    alpha=1.,
                    xscale='log',
@@ -68,29 +78,37 @@ class Plotter:
         self.plot(title=title, xscale=xscale, yscale=yscale)
         for values in values_list:
             plt.plot(sorted(values, reverse=True), color=self.color(color), alpha=alpha)
+        if save_path:
+            self.save(save_path)
         plt.show()
 
 
     def histogram(self,
                   values,
                   title='Histogram',
+                  save_path=None,
                   color=None,
                   alpha=1.,
                   xscale=None,
                   yscale=None):
         self.plot(title=title, xscale=xscale, yscale=yscale)
         plt.hist(values, color=self.color(color), alpha=alpha)
+        if save_path:
+            self.save(save_path)
         plt.show()
 
     def loglog(self,
                values,
                title='log-log',
+               save_path=None,
                color=None,
                alpha=1.,
                xscale='symlog',
                yscale='symlog'):
         self.plot(title=title, xscale=xscale, yscale=yscale)
         plt.plot(sorted(values, reverse=True), 'o', color=self.color(color), alpha=alpha)
+        if save_path:
+            self.save(save_path)
         plt.show()
 
     def density_scatter(self,
@@ -98,6 +116,7 @@ class Plotter:
                         y,
                         z='heat',
                         title='Density Scatter',
+                        save_path=None,
                         color=None,
                         alpha=1.,
                         xscale='symlog',
@@ -118,11 +137,13 @@ class Plotter:
 
         ax = fig.add_subplot(1, 1, 1)
         ax.grid(True, linestyle='-', color='0.75')
-        if z = 'heat': # plot density as heat map
+        if z == 'heat': # plot density as heat map
             if not vmax:
                 vmax = np.max(z_vals) # make one heat color range to max density
             density = ax.scatter(x, y, s=20, c=z_vals, marker='o', cmap='gist_heat_r', vmin=vmin, vmax=vmax)
         else: # plot density as point size
             density = ax.scatter(x, y, s=z_vals, marker='o')
         fig.colorbar(density, label='density of points')
+        if save_path:
+            self.save(save_path)
         plt.show()
