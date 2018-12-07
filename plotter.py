@@ -52,11 +52,14 @@ class Plotter:
         if given_color:
             return given_color
         else:
-            return self.color_genie.get_color()
+            return self.theme.primary
+            # return self.color_genie.get_color()
 
     def rank(self,
              values,
              title='Rank Plot',
+             xlabel='rank of values',
+             ylabel='value',
              save_path=None,
              color=None,
              alpha=1.,
@@ -76,6 +79,8 @@ class Plotter:
     def multi_rank(self,
                    values_list,
                    title='Rank Plot',
+                   xlabel='ranks of values',
+                   ylabel='values'
                    save_path=None,
                    color=None,
                    alpha=1.,
