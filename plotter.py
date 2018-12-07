@@ -188,3 +188,15 @@ class Plotter:
         if save_path:
             self.save(save_path)
         plt.show()
+
+    def confusion_matrix(self,
+                         values,
+                         title='Confusion Matrix',
+                         save_path=None,
+                         vmin=None,
+                         vmax=None):
+        self.plot(title=title, ylabel='', xlabel='')
+        sns.heatmap(values, vmin=vmin, vmax=vmax)
+        if save_path:
+            self.save(save_path)
+        plt.show()
