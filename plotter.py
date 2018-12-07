@@ -50,7 +50,13 @@ class Plotter:
 
     def color(self, given_color):
         if given_color:
-            if given_color == 'random':
+            if given_color == 1:
+                return self.theme.primary
+            elif given_color == 2:
+                return self.theme.secondary
+            elif given_color == 3:
+                return self.theme.secondary
+            elif given_color == 'random':
                 return self.color_genie.get_color()
             return given_color
         else:
@@ -105,6 +111,24 @@ class Plotter:
                   yscale=None):
         self.plot(title=title, xscale=xscale, yscale=yscale)
         plt.hist(values, color=self.color(color), alpha=alpha)
+        if save_path:
+            self.save(save_path)
+        plt.show()
+
+    def multi_histogram(self,
+                        values_list,
+                        title='Histogram',
+                        xlabel='bins',
+                        ylabel='number of items in bins',
+                        save_path=None,
+                        color=None,
+                        alpha=0.5,
+                        xscale=None,
+                        yscale=None):
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
+        for i, values in enumerate(values_list):
+            color = color if color else i + 1
+            plt.hist(values, color=self.color(color), alpha=alpha)
         if save_path:
             self.save(save_path)
         plt.show()
