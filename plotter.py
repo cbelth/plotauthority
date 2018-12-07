@@ -3,6 +3,7 @@ import seaborn as sns
 from color_theory import ColorTheory
 import numpy as np
 from theme import Theme
+from utils import *
 
 class Plotter:
     def __init__(self, theme=None):
@@ -121,14 +122,16 @@ class Plotter:
                         xlabel='bins',
                         ylabel='number of items in bins',
                         save_path=None,
-                        color=None,
-                        alpha=0.5,
+                        colors=None,
+                        alphas=[0.5, 0.5],
                         xscale=None,
                         yscale=None):
         self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
+        if not check_args(values_list, colors, alphas):
+            return
         for i, values in enumerate(values_list):
             color = color if color else i + 1
-            plt.hist(values, color=self.color(color), alpha=alpha)
+            plt.hist(values, color=self.color(color), alpha=alphas[i])
         if save_path:
             self.save(save_path)
         plt.show()
