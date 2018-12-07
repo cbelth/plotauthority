@@ -32,7 +32,7 @@ class Plotter:
         :ylabel: The ylabel for the plot
         '''
         fig = plt.figure(figsize=size)
-        plt.title(titel, fontsize=fontsize)
+        plt.title(title, fontsize=fontsize)
         plt.xlabel(xlabel, fontsize=fontsize)
         plt.ylabel(ylabel, fontsize=fontsize)
         if xscale:
@@ -50,10 +50,11 @@ class Plotter:
 
     def color(self, given_color):
         if given_color:
+            if given_color == 'random':
+                return self.color_genie.get_color()
             return given_color
         else:
             return self.theme.primary
-            # return self.color_genie.get_color()
 
     def rank(self,
              values,
@@ -70,8 +71,8 @@ class Plotter:
 
         :values: the values to plot
         '''
-        self.plot(title=title, xscale=xscale, yscale=yscale)
-        plt.plot(sorted(values, reverse=True), color=self.color(color), alpha=alpha)
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
+        plt.plot(sorted(values, reverse=True), 'o', color=self.color(color), alpha=alpha)
         if save_path:
             self.save(save_path)
         plt.show()
@@ -80,15 +81,15 @@ class Plotter:
                    values_list,
                    title='Rank Plot',
                    xlabel='ranks of values',
-                   ylabel='values'
+                   ylabel='values',
                    save_path=None,
                    color=None,
                    alpha=1.,
                    xscale='log',
                    yscale='log'):
-        self.plot(title=title, xscale=xscale, yscale=yscale)
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
         for values in values_list:
-            plt.plot(sorted(values, reverse=True), color=self.color(color), alpha=alpha)
+            plt.plot(sorted(values, reverse=True), 'o', color=self.color(color, 'random'), alpha=alpha)
         if save_path:
             self.save(save_path)
         plt.show()
@@ -111,6 +112,8 @@ class Plotter:
     def loglog(self,
                values,
                title='log-log',
+               xlabel='rank',
+               ylabel='value',
                save_path=None,
                color=None,
                alpha=1.,
