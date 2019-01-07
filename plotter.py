@@ -3,7 +3,7 @@ import seaborn as sns
 from color_theory import ColorTheory
 import numpy as np
 from theme import Theme
-from utils import *
+import utils
 
 class Plotter:
     def __init__(self, theme=None):
@@ -23,6 +23,8 @@ class Plotter:
              xscale=None,
              yscale=None,
              fontsize=16,
+             xlim=None,
+             ylim=None,
              background=(0.8588235294117647, 0.8588235294117647, 0.8588235294117647)):
         '''
         The main plot function. This is responsible for managing the plot.
@@ -33,6 +35,10 @@ class Plotter:
         :ylabel: The ylabel for the plot
         '''
         fig = plt.figure(figsize=size)
+        if xlim:
+            plt.xlim(xlim)
+        if ylim:
+            plt.ylim(xlim)
         plt.title(title, fontsize=fontsize)
         plt.xlabel(xlabel, fontsize=fontsize)
         plt.ylabel(ylabel, fontsize=fontsize)
@@ -105,13 +111,16 @@ class Plotter:
     def histogram(self,
                   values,
                   title='Histogram',
+                  xlabel='bins',
+                  ylabel='number of items in bins',
                   save_path=None,
                   color=None,
                   alpha=1.,
+                  bins=10,
                   xscale=None,
                   yscale=None):
-        self.plot(title=title, xscale=xscale, yscale=yscale)
-        plt.hist(values, color=self.color(color), alpha=alpha)
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
+        plt.hist(values, bins=bins, edgecolor='black', color=self.color(color), alpha=alpha)
         if save_path:
             self.save(save_path)
         plt.show()
@@ -122,16 +131,19 @@ class Plotter:
                         xlabel='bins',
                         ylabel='number of items in bins',
                         save_path=None,
+                        bins=10,
+                        labels=['first', 'second'],
                         colors=None,
                         alphas=[0.5, 0.5],
                         xscale=None,
                         yscale=None):
         self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
-        if not check_args(values_list, colors, alphas):
-            return
+        #if not utils.check_args(values_list, colors, alphas):
+        #    return
         for i, values in enumerate(values_list):
-            color = color if color else i + 1
-            plt.hist(values, color=self.color(color), alpha=alphas[i])
+            color = colors[i] if colors else i + 1
+            plt.hist(values, bins=bins, edgecolor='black', color=self.color(color), alpha=alphas[i], label=labels[i])
+        plt.legend(fontsize=16)
         if save_path:
             self.save(save_path)
         plt.show()
@@ -164,7 +176,7 @@ class Plotter:
                         yscale='symlog',
                         vmin=0.0,
                         vmax=None):
-        self.plot(title=title, xscale=xscale, yscale=yscale)
+        #self.plot(title=title, xscale=xscale, yscale=yscale)
         xy_unique = dict()
         # count the number of occurrences of each x, y value
         for _x, _y in zip(x, y):
@@ -174,8 +186,9 @@ class Plotter:
         x = list(_x for _x, _ in xy_unique.keys())
         y = list(_y for _, _y in xy_unique.keys())
         # the 3rd dimension is the counts
-        z_vals = xy_unique.values()
+        z_vals = list(xy_unique.values())
 
+        fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         ax.grid() # TODO: ax.grid(True, linestyle='-', color='0.75'?)
         if z == 'heat': # plot density as heat map
@@ -189,14 +202,34 @@ class Plotter:
             self.save(save_path)
         plt.show()
 
+    def x_vs_y(self,
+               x,
+               y,
+               title='y = f(x)',
+               xlabel='x',
+               ylabel='f(x)',
+               save_path=None,
+               color=None,
+               alpha=1.,
+               xlim=None,
+               ylim=None,
+               xscale=None,
+               yscale=None):
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
+        plt.plot(x, y, '-o', color=self.color(color), alpha=alpha)
+        if save_path:
+            self.save(save_path)
+        plt.show()
+
     def confusion_matrix(self,
                          values,
                          title='Confusion Matrix',
                          save_path=None,
+                         names=None,
                          vmin=None,
                          vmax=None):
         self.plot(title=title, ylabel='', xlabel='')
-        sns.heatmap(values, vmin=vmin, vmax=vmax)
+        sns.heatmap(values, xticklabels=names, yticklabels=names, vmin=vmin, vmax=vmax)
         if save_path:
             self.save(save_path)
         plt.show()
