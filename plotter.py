@@ -4,12 +4,15 @@ from color_theory import ColorTheory
 import numpy as np
 from theme import Theme
 import utils
+from collections import defaultdict
 
 class Plotter:
-    def __init__(self, theme=None):
+    def __init__(self, theme=None, backend=None):
         if not theme:
             self.theme = Theme() # default theme
         self.color_genie = ColorTheory()
+        if backend:
+            plt.switch_backend(backend)
         return
 
     def set_theme(self, theme):
@@ -188,7 +191,7 @@ class Plotter:
         # the 3rd dimension is the counts
         z_vals = list(xy_unique.values())
 
-        fig = plt.figure()
+        fig = plt.figure(figsize=(15,10))
         ax = fig.add_subplot(1, 1, 1)
         ax.grid() # TODO: ax.grid(True, linestyle='-', color='0.75'?)
         if z == 'heat': # plot density as heat map
@@ -216,7 +219,87 @@ class Plotter:
                xscale=None,
                yscale=None):
         self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
-        plt.plot(x, y, '-o', color=self.color(color), alpha=alpha)
+        #plt.plot(x, y, marker, color=self.color(color), alpha=alpha)
+        plt.scatter(x, y, color=self.color(color), alpha=alpha)
+        if save_path:
+            self.save(save_path)
+        plt.show()
+    
+    def pdf(self,
+            data,
+            title='pdf',
+            xlabel='x',
+            ylabel='p(x)',
+            save_path=None,
+            color=None,
+            alpha=0.8,
+            marker='-o',
+            xlim=None,
+            ylim=None,
+            xscale='symlog',
+            yscale='symlog'):
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
+        counts = defaultdict(int)
+        for x in data:
+            counts[x] += 1
+        x = list()
+        y = list()
+        for d in sorted(list(set(data))):
+            x.append(d)
+            y.append(counts[d])
+        y = np.asarray(y) / np.sum(y)
+        plt.plot(x, y, marker, color=self.color(color), alpha=alpha)
+        if save_path:
+            self.save(save_path)
+        plt.show()
+
+    def pareto(self,
+               data,
+               title='pareto',
+               xlabel='x',
+               ylabel='p(deg >= x)',
+               save_path=None,
+               color=None,
+               alpha=0.8,
+               marker='o',
+               xlim=None,
+               ylim=None,
+               xscale='symlog',
+               yscale='symlog'):
+        counts = defaultdict(int)
+        m = np.max(data)
+        for x in data:
+            counts[x] += 1
+        x = list()
+        y = list()
+        s = len(data)
+        for _x in sorted(list(set(data))):
+            x.append(_x)
+            s -= counts[_x]
+            y.append(s)
+
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
+        y = np.asarray(y) / np.sum(y)
+        plt.plot(x, y, marker, color=self.color(color), alpha=alpha)
+        if save_path:
+            self.save(save_path)
+        plt.show()
+
+    def zipf(self,
+             data,
+             title='pdf',
+             xlabel='x',
+             ylabel='p(x)',
+             save_path=None,
+             color=None,
+             alpha=1.,
+             marker='o',
+             xlim=None,
+             ylim=None,
+             xscale='symlog',
+             yscale='symlog'):
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
+        plt.plot(sorted(data, reverse=True), marker, color=self.color(color), alpha=alpha)
         if save_path:
             self.save(save_path)
         plt.show()
@@ -233,3 +316,31 @@ class Plotter:
         if save_path:
             self.save(save_path)
         plt.show()
+
+    def x_vs_y_with_line(self,
+                         x,
+                         y,
+                         title='y = f(x)',
+                         xlabel='x',
+                         ylabel='f(x)',
+                         save_path=None,
+                         color=None,
+                         alpha=1.,
+                         xlim=None,
+                         ylim=None,
+                         xscale=None,
+                         yscale=None):
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
+        plt.scatter(x, y, color=self.color(color), alpha=alpha)
+        _x = np.log(x) if xscale in {'log', 'symlog'} else x
+        _y = np.log(y) if yscale in {'log', 'symlog'} else y
+        slope, intercept = np.polyfit(_x, _y, deg=1)
+        _x = range(round(np.min(x)), round(np.max(x)) * 2)
+        _x = np.round(plt.xlim())
+        _y = intercept + slope * np.log(_x) if xscale in {'log', 'symlog'} else intercept + slope * _x
+        plt.plot(_x, np.e ** _y, color=self.color(color), alpha=alpha, label='exp = {}'.format(round(slope, 2)))
+        plt.legend(fontsize=16)
+        if save_path:
+            self.save(save_path)
+        plt.show()
+
