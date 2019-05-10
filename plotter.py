@@ -120,10 +120,11 @@ class Plotter:
                   color=None,
                   alpha=1.,
                   bins=10,
+                  xlim=None,
                   xticks=None,
                   xscale=None,
                   yscale=None):
-        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim)
         plt.hist(values, bins=bins, edgecolor='black', color=self.color(color), alpha=alpha)
         if xticks:
             plt.xticks(np.arange(len(values)), xticks)
