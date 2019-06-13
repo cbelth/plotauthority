@@ -25,7 +25,7 @@ class Plotter:
              size=(15,10),
              xscale=None,
              yscale=None,
-             fontsize=16,
+             fontsize=26,
              xlim=None,
              ylim=None,
              background=(0.8588235294117647, 0.8588235294117647, 0.8588235294117647)):
@@ -214,13 +214,16 @@ class Plotter:
                save_path=None,
                color=None,
                alpha=1.,
+               with_line=False,
                xlim=None,
                ylim=None,
                xscale=None,
                yscale=None):
         self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
-        #plt.plot(x, y, marker, color=self.color(color), alpha=alpha)
-        plt.scatter(x, y, color=self.color(color), alpha=alpha)
+        if with_line:
+            plt.plot(x, y, '-o', color=self.color(color), alpha=alpha)
+        else:
+            plt.scatter(x, y, color=self.color(color), alpha=alpha)
         if save_path:
             self.save(save_path)
         plt.show()
@@ -338,9 +341,65 @@ class Plotter:
         _x = range(round(np.min(x)), round(np.max(x)) * 2)
         _x = np.round(plt.xlim())
         _y = intercept + slope * np.log(_x) if xscale in {'log', 'symlog'} else intercept + slope * _x
-        plt.plot(_x, np.e ** _y, color=self.color(color), alpha=alpha, label='exp = {}'.format(round(slope, 2)))
-        plt.legend(fontsize=16)
+        if yscale in {'log', 'symlog'}:
+            _y = np.e ** _y
+        plt.plot(_x, _y, color=self.color(color), alpha=alpha, label='exp = {}'.format(round(slope, 2)))
+        plt.legend(fontsize=26)
         if save_path:
             self.save(save_path)
         plt.show()
 
+    def x_vs_y_with_log_func(self,
+                             x,
+                             y,
+                             title='y = f(x)',
+                             xlabel='x',
+                             ylabel='f(x)',
+                             save_path=None,
+                             color=None,
+                             alpha=1.,
+                             xlim=None,
+                             ylim=None,
+                             xscale=None,
+                             yscale=None):
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
+        plt.scatter(x, y, color=self.color(color), alpha=alpha)
+        slope, intercept = np.polyfit(np.log(x), y, 1)
+        _x = range(1, int(np.ceil(plt.xlim()[1])))
+        _y = intercept + slope * np.log(_x)#* np.log(_x) if xscale in {'log', 'symlog'} else intercept + slope * _x
+        #if yscale in {'log', 'symlog'}:
+        #    _y = np.e ** _y
+        print(slope, intercept)
+    
+        plt.plot(_x, _y, '-', color=self.color(color), alpha=alpha, label='exp = {}'.format(round(slope, 2)))
+        #plt.legend(fontsize=16)
+        if save_path:
+            self.save(save_path)
+        plt.show()
+
+    def x_vs_y_multiple(self,
+                        xs,
+                        ys,
+                        labels,
+                        title='y = f(x)',
+                        xlabel='x',
+                        ylabel='f(x)',
+                        save_path=None,
+                        color=None,
+                        alpha=1.,
+                        with_line=False,
+                        xlim=None,
+                        ylim=None,
+                        xscale=None,
+                        yscale=None):
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
+        if with_line:
+            for x, y, label in zip(xs, ys, labels):
+                plt.plot(x, y, '-o', label=label, color=self.color('random'), alpha=alpha)
+        else:
+            for x, y, label in zip(xs, ys, labels):
+                plt.scatter(x, y, label=label, color=self.color('random'), alpha=alpha)
+        plt.legend(fontsize=14)
+        if save_path:
+            self.save(save_path)
+        plt.show()
