@@ -120,10 +120,31 @@ class Plotter:
                   color=None,
                   alpha=1.,
                   bins=10,
+                  xlim=None,
+                  xticks=None,
                   xscale=None,
                   yscale=None):
-        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim)
         plt.hist(values, bins=bins, edgecolor='black', color=self.color(color), alpha=alpha)
+        if xticks:
+            plt.xticks(np.arange(len(values)), xticks)
+        if save_path:
+            self.save(save_path)
+        plt.show()
+    
+    def basic_plot(self,
+                   values,
+                   title='A simple plot of the points',
+                   xlabel='x',
+                   ylabel='values',
+                   save_path=None,
+                   color=None,
+                   alpha=1.,
+                   xticks=None,
+                   xscale=None,
+                   yscale=None):
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
+        plt.plot(values, 'o', color=self.color(color), alpha=alpha)
         if save_path:
             self.save(save_path)
         plt.show()
@@ -290,9 +311,9 @@ class Plotter:
 
     def zipf(self,
              data,
-             title='pdf',
-             xlabel='x',
-             ylabel='p(x)',
+             title='zipf',
+             xlabel='rank',
+             ylabel='val',
              save_path=None,
              color=None,
              alpha=1.,
@@ -373,6 +394,7 @@ class Plotter:
     
         plt.plot(_x, _y, '-', color=self.color(color), alpha=alpha, label='exp = {}'.format(round(slope, 2)))
         #plt.legend(fontsize=16)
+        plt.legend(fontsize=16)
         if save_path:
             self.save(save_path)
         plt.show()
@@ -399,7 +421,32 @@ class Plotter:
         else:
             for x, y, label in zip(xs, ys, labels):
                 plt.scatter(x, y, label=label, color=self.color('random'), alpha=alpha)
-        plt.legend(fontsize=14)
+        plt.legend(fontsize=16)
+        if save_path:
+            self.save(save_path)
+        plt.show()
+
+    def x_vs_y_with_y_eq_x(self,
+                           x,
+                           y,
+                           title='y = f(x)',
+                           xlabel='x',
+                           ylabel='f(x)',
+                           save_path=None,
+                           color=None,
+                           alpha=1.,
+                           xlim=None,
+                           ylim=None,
+                           xscale=None,
+                           yscale=None):
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
+        plt.scatter(x, y, color=self.color(color), alpha=alpha)
+        slope, intercept = (1, 0)
+        _x = range(round(np.min(x)), round(np.max(x)) * 2)
+        _x = np.round(plt.xlim())
+        _y = intercept + slope * np.log(_x) if xscale in {'log', 'symlog'} else intercept + slope * _x
+        plt.plot(_x, np.e ** _y, color=self.color(color), alpha=alpha, label='{} = {}'.format(ylabel, xlabel))
+        plt.legend(fontsize=16)
         if save_path:
             self.save(save_path)
         plt.show()
