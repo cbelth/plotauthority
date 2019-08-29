@@ -7,7 +7,8 @@ import utils
 from collections import defaultdict
 
 class Plotter:
-    def __init__(self, theme=None, backend=None):
+    def __init__(self, fontsize=30, theme=None, backend=None):
+        self.fontsize = fontsize
         if not theme:
             self.theme = Theme() # default theme
         self.color_genie = ColorTheory()
@@ -25,7 +26,6 @@ class Plotter:
              size=(15,10),
              xscale=None,
              yscale=None,
-             fontsize=26,
              xlim=None,
              ylim=None,
              background=(0.8588235294117647, 0.8588235294117647, 0.8588235294117647)):
@@ -42,9 +42,11 @@ class Plotter:
             plt.xlim(xlim)
         if ylim:
             plt.ylim(xlim)
-        plt.title(title, fontsize=fontsize)
-        plt.xlabel(xlabel, fontsize=fontsize)
-        plt.ylabel(ylabel, fontsize=fontsize)
+        plt.title(title, fontsize=self.fontsize)
+        plt.xlabel(xlabel, fontsize=self.fontsize)
+        plt.ylabel(ylabel, fontsize=self.fontsize)
+        plt.xticks(fontsize=self.fontsize)
+        plt.yticks(fontsize=self.fontsize)
         if xscale:
             plt.xscale(xscale)
         if yscale:
@@ -131,7 +133,7 @@ class Plotter:
         if save_path:
             self.save(save_path)
         plt.show()
-    
+
     def basic_plot(self,
                    values,
                    title='A simple plot of the points',
@@ -248,7 +250,7 @@ class Plotter:
         if save_path:
             self.save(save_path)
         plt.show()
-    
+
     def pdf(self,
             data,
             title='pdf',
@@ -260,8 +262,8 @@ class Plotter:
             marker='-o',
             xlim=None,
             ylim=None,
-            xscale='symlog',
-            yscale='symlog'):
+            xscale='log',
+            yscale='log'):
         self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
         counts = defaultdict(int)
         for x in data:
@@ -288,8 +290,8 @@ class Plotter:
                marker='o',
                xlim=None,
                ylim=None,
-               xscale='symlog',
-               yscale='symlog'):
+               xscale='log',
+               yscale='log'):
         counts = defaultdict(int)
         m = np.max(data)
         for x in data:
@@ -391,7 +393,7 @@ class Plotter:
         #if yscale in {'log', 'symlog'}:
         #    _y = np.e ** _y
         print(slope, intercept)
-    
+
         plt.plot(_x, _y, '-', color=self.color(color), alpha=alpha, label='exp = {}'.format(round(slope, 2)))
         #plt.legend(fontsize=16)
         plt.legend(fontsize=16)
@@ -407,7 +409,7 @@ class Plotter:
                         xlabel='x',
                         ylabel='f(x)',
                         save_path=None,
-                        color=None,
+                        colors=[None, None],
                         alpha=1.,
                         with_line=False,
                         xlim=None,
@@ -416,11 +418,11 @@ class Plotter:
                         yscale=None):
         self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
         if with_line:
-            for x, y, label in zip(xs, ys, labels):
-                plt.plot(x, y, '-o', label=label, color=self.color('random'), alpha=alpha)
+            for x, y, label, color in zip(xs, ys, labels, colors):
+                plt.plot(x, y, '-o', label=label, color=self.color('random') if not color else color, alpha=alpha)
         else:
-            for x, y, label in zip(xs, ys, labels):
-                plt.scatter(x, y, label=label, color=self.color('random'), alpha=alpha)
+            for x, y, label, color in zip(xs, ys, labels, colors):
+                plt.scatter(x, y, label=label, color=self.color('random') if not color else color, alpha=alpha)
         plt.legend(fontsize=16)
         if save_path:
             self.save(save_path)
@@ -447,6 +449,27 @@ class Plotter:
         _y = intercept + slope * np.log(_x) if xscale in {'log', 'symlog'} else intercept + slope * _x
         plt.plot(_x, np.e ** _y, color=self.color(color), alpha=alpha, label='{} = {}'.format(ylabel, xlabel))
         plt.legend(fontsize=16)
+        if save_path:
+            self.save(save_path)
+        plt.show()
+
+    def bar(self,
+            x,
+            y,
+            title='Bar plot',
+            xlabel='items',
+            ylabel='number',
+            save_path=None,
+            color=None,
+            alpha=1.,
+            xlim=None,
+            xticks=None,
+            xscale=None,
+            yscale=None):
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim)
+        plt.bar(x, y, color=self.color(color), alpha=alpha)
+        if xticks:
+            plt.xticks(np.arange(1, len(x) + 1), xticks)
         if save_path:
             self.save(save_path)
         plt.show()
