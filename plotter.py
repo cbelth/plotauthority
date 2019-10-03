@@ -45,12 +45,13 @@ class Plotter:
         plt.title(title, fontsize=self.fontsize)
         plt.xlabel(xlabel, fontsize=self.fontsize)
         plt.ylabel(ylabel, fontsize=self.fontsize)
-        plt.xticks(fontsize=self.fontsize)
-        plt.yticks(fontsize=self.fontsize)
         if xscale:
             plt.xscale(xscale)
         if yscale:
             plt.yscale(yscale)
+
+        plt.xticks(fontsize=self.fontsize)
+        plt.yticks(fontsize=self.fontsize)
         plt.rcParams['axes.facecolor'] = background
         plt.grid()
 
@@ -58,7 +59,7 @@ class Plotter:
         if not path.endswith('.jpg'):
             print('Path to save should end in .jpg')
             return
-        plt.savefig(path, format='jpg', dpi=500)
+        plt.savefig(path, format='jpg', dpi=500, bbox_inches='tight')
 
     def color(self, given_color):
         if given_color:
@@ -469,7 +470,7 @@ class Plotter:
         self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim)
         plt.bar(x, y, color=self.color(color), alpha=alpha)
         if xticks:
-            plt.xticks(np.arange(1, len(x) + 1), xticks)
+            plt.xticks(np.arange(1, len(x) + 1), xticks, rotation=90)
         if save_path:
             self.save(save_path)
         plt.show()
