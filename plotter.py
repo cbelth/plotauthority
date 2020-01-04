@@ -260,7 +260,7 @@ class Plotter:
             save_path=None,
             color=None,
             alpha=0.8,
-            marker='-o',
+            marker='o',
             xlim=None,
             ylim=None,
             xscale='log',
