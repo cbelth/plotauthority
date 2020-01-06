@@ -228,6 +228,7 @@ class Plotter:
         z_vals = list(xy_unique.values())
 
         fig = plt.figure(figsize=(15,10))
+        plt.rc('legend', fontsize=30)
         ax = fig.add_subplot(1, 1, 1)
         ax.grid() # TODO: ax.grid(True, linestyle='-', color='0.75'?)
         if z == 'heat': # plot density as heat map
@@ -401,12 +402,12 @@ class Plotter:
         _x = np.log(x) if xscale in {'log', 'symlog'} else x
         _y = np.log(y) if yscale in {'log', 'symlog'} else y
         slope, intercept = np.polyfit(_x, _y, deg=1)
-        _x = range(round(np.min(x)), round(np.max(x)) * 2)
+        _x = range(int(round(np.min(x))), int(round(np.max(x)) * 2))
         _x = np.round(plt.xlim())
         _y = intercept + slope * np.log(_x) if xscale in {'log', 'symlog'} else intercept + slope * _x
         if yscale in {'log', 'symlog'}:
             _y = np.e ** _y
-        plt.plot(_x, _y, color=self.color(color), alpha=alpha, label='exp = {}'.format(round(slope, 2)))
+        plt.plot(_x, _y, color=self.color(color), alpha=alpha, label='slope = {}'.format(round(slope, 2)))
         plt.legend(fontsize=26)
         if save_path:
             self.save(save_path, dpi)
