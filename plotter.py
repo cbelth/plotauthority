@@ -55,11 +55,14 @@ class Plotter:
         plt.rcParams['axes.facecolor'] = background
         plt.grid()
 
-    def save(self, path):
+    def save(self, path, dpi=500, sns_plot=None):
         if not path.endswith('.jpg'):
             print('Path to save should end in .jpg')
             return
-        plt.savefig(path, format='jpg', dpi=500, bbox_inches='tight')
+        if sns_plot:
+            sns_plot.savefig(path, format='jpg', dpi=dpi, bbox_inches='tight')
+        else:
+            plt.savefig(path, format='jpg', dpi=dpi, bbox_inches='tight')
 
     def color(self, given_color):
         if given_color:
@@ -81,6 +84,7 @@ class Plotter:
              xlabel='rank of values',
              ylabel='value',
              save_path=None,
+             dpi=500,
              color=None,
              alpha=1.,
              xscale='log',
@@ -93,7 +97,7 @@ class Plotter:
         self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
         plt.plot(sorted(values, reverse=True), 'o', color=self.color(color), alpha=alpha)
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
 
     def multi_rank(self,
@@ -102,6 +106,7 @@ class Plotter:
                    xlabel='ranks of values',
                    ylabel='values',
                    save_path=None,
+                   dpi=500,
                    color=None,
                    alpha=1.,
                    xscale='log',
@@ -110,7 +115,7 @@ class Plotter:
         for values in values_list:
             plt.plot(sorted(values, reverse=True), 'o', color=self.color(color, 'random'), alpha=alpha)
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
 
 
@@ -120,6 +125,7 @@ class Plotter:
                   xlabel='bins',
                   ylabel='number of items in bins',
                   save_path=None,
+                  dpi=500,
                   color=None,
                   alpha=1.,
                   bins=10,
@@ -132,7 +138,7 @@ class Plotter:
         if xticks:
             plt.xticks(np.arange(len(values)), xticks)
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
 
     def basic_plot(self,
@@ -141,6 +147,7 @@ class Plotter:
                    xlabel='x',
                    ylabel='values',
                    save_path=None,
+                   dpi=500,
                    color=None,
                    alpha=1.,
                    xticks=None,
@@ -149,7 +156,7 @@ class Plotter:
         self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
         plt.plot(values, 'o', color=self.color(color), alpha=alpha)
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
 
     def multi_histogram(self,
@@ -158,6 +165,7 @@ class Plotter:
                         xlabel='bins',
                         ylabel='number of items in bins',
                         save_path=None,
+                        dpi=500,
                         bins=10,
                         labels=['first', 'second'],
                         colors=None,
@@ -172,7 +180,7 @@ class Plotter:
             plt.hist(values, bins=bins, edgecolor='black', color=self.color(color), alpha=alphas[i], label=labels[i])
         plt.legend(fontsize=16)
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
 
     def loglog(self,
@@ -181,6 +189,7 @@ class Plotter:
                xlabel='rank',
                ylabel='value',
                save_path=None,
+               dpi=500,
                color=None,
                alpha=1.,
                xscale='symlog',
@@ -188,7 +197,7 @@ class Plotter:
         self.plot(title=title, xscale=xscale, yscale=yscale)
         plt.plot(sorted(values, reverse=True), 'o', color=self.color(color), alpha=alpha)
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
 
     def density_scatter(self,
@@ -197,6 +206,7 @@ class Plotter:
                         z='heat',
                         title='Density Scatter',
                         save_path=None,
+                        dpi=500,
                         color=None,
                         alpha=1.,
                         xscale='symlog',
@@ -226,7 +236,7 @@ class Plotter:
             density = ax.scatter(x, y, s=z_vals, marker='o')
         fig.colorbar(density, label='density of points')
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
 
     def x_vs_y(self,
@@ -236,6 +246,7 @@ class Plotter:
                xlabel='x',
                ylabel='f(x)',
                save_path=None,
+               dpi=500,
                color=None,
                alpha=1.,
                with_line=False,
@@ -249,7 +260,7 @@ class Plotter:
         else:
             plt.scatter(x, y, color=self.color(color), alpha=alpha)
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
 
     def pdf(self,
@@ -258,6 +269,7 @@ class Plotter:
             xlabel='x',
             ylabel='p(x)',
             save_path=None,
+            dpi=500,
             color=None,
             alpha=0.8,
             marker='o',
@@ -277,7 +289,7 @@ class Plotter:
         y = np.asarray(y) / np.sum(y)
         plt.plot(x, y, marker, color=self.color(color), alpha=alpha)
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
 
     def pareto(self,
@@ -286,6 +298,7 @@ class Plotter:
                xlabel='x',
                ylabel='p(deg >= x)',
                save_path=None,
+               dpi=500,
                color=None,
                alpha=0.8,
                marker='o',
@@ -309,7 +322,7 @@ class Plotter:
         y = np.asarray(y) / np.sum(y)
         plt.plot(x, y, marker, color=self.color(color), alpha=alpha)
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
 
     def zipf(self,
@@ -318,6 +331,7 @@ class Plotter:
              xlabel='rank',
              ylabel='val',
              save_path=None,
+             dpi=500,
              color=None,
              alpha=1.,
              marker='o',
@@ -328,20 +342,42 @@ class Plotter:
         self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
         plt.plot(sorted(data, reverse=True), marker, color=self.color(color), alpha=alpha)
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
 
     def confusion_matrix(self,
                          values,
                          title='Confusion Matrix',
+                         cmap='inverted',
+                         with_nums=False,
                          save_path=None,
+                         dpi=500,
                          names=None,
                          vmin=None,
                          vmax=None):
         self.plot(title=title, ylabel='', xlabel='')
-        sns.heatmap(values, xticklabels=names, yticklabels=names, vmin=vmin, vmax=vmax)
+        sns.set(font_scale=3)
+        sns_plot = sns.heatmap(values,
+                    xticklabels=names,
+                    yticklabels=names,
+                    vmin=vmin,
+                    vmax=vmax,
+                    annot=with_nums,
+                    cmap=sns.cm.rocket_r if cmap == 'inverted' else None,
+                    linewidth=1,
+                    linecolor='black')
+        sns_plot = sns_plot.get_figure()
+
+        # from: https://github.com/mwaskom/seaborn/issues/1773
+        # fix for mpl bug that cuts off top/bottom of seaborn viz
+        b, t = plt.ylim() # discover the values for bottom and top
+        b += 0.5 # Add 0.5 to the bottom
+        t -= 0.5 # Subtract 0.5 from the top
+        plt.ylim(b, t) # update the ylim(bottom, top) values
+        plt.show() # ta-da!
+
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi, sns_plot)
         plt.show()
 
     def x_vs_y_with_line(self,
@@ -351,6 +387,7 @@ class Plotter:
                          xlabel='x',
                          ylabel='f(x)',
                          save_path=None,
+                         dpi=500,
                          color=None,
                          alpha=1.,
                          xlim=None,
@@ -370,7 +407,7 @@ class Plotter:
         plt.plot(_x, _y, color=self.color(color), alpha=alpha, label='exp = {}'.format(round(slope, 2)))
         plt.legend(fontsize=26)
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
 
     def x_vs_y_with_log_func(self,
@@ -380,6 +417,7 @@ class Plotter:
                              xlabel='x',
                              ylabel='f(x)',
                              save_path=None,
+                             dpi=500,
                              color=None,
                              alpha=1.,
                              xlim=None,
@@ -399,7 +437,7 @@ class Plotter:
         #plt.legend(fontsize=16)
         plt.legend(fontsize=16)
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
 
     def x_vs_y_multiple(self,
@@ -410,6 +448,7 @@ class Plotter:
                         xlabel='x',
                         ylabel='f(x)',
                         save_path=None,
+                        dpi=500,
                         colors=[None, None],
                         alpha=1.,
                         with_line=False,
@@ -424,9 +463,9 @@ class Plotter:
         else:
             for x, y, label, color in zip(xs, ys, labels, colors):
                 plt.scatter(x, y, label=label, color=self.color('random') if not color else color, alpha=alpha)
-        plt.legend(fontsize=16)
+        plt.legend(fontsize=30)
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
 
     def x_vs_y_with_y_eq_x(self,
@@ -436,6 +475,7 @@ class Plotter:
                            xlabel='x',
                            ylabel='f(x)',
                            save_path=None,
+                           dpi=500,
                            color=None,
                            alpha=1.,
                            xlim=None,
@@ -451,7 +491,7 @@ class Plotter:
         plt.plot(_x, np.e ** _y, color=self.color(color), alpha=alpha, label='{} = {}'.format(ylabel, xlabel))
         plt.legend(fontsize=16)
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
 
     def bar(self,
@@ -461,6 +501,7 @@ class Plotter:
             xlabel='items',
             ylabel='number',
             save_path=None,
+            dpi=500,
             color=None,
             alpha=1.,
             xlim=None,
@@ -472,5 +513,5 @@ class Plotter:
         if xticks:
             plt.xticks(np.arange(1, len(x) + 1), xticks, rotation=90)
         if save_path:
-            self.save(save_path)
+            self.save(save_path, dpi)
         plt.show()
