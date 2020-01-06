@@ -28,6 +28,7 @@ class Plotter:
              yscale=None,
              xlim=None,
              ylim=None,
+             grid=True,
              background=(0.8588235294117647, 0.8588235294117647, 0.8588235294117647)):
         '''
         The main plot function. This is responsible for managing the plot.
@@ -53,7 +54,8 @@ class Plotter:
         plt.xticks(fontsize=self.fontsize)
         plt.yticks(fontsize=self.fontsize)
         plt.rcParams['axes.facecolor'] = background
-        plt.grid()
+        if grid:
+            plt.grid()
 
     def save(self, path, dpi=500, sns_plot=None):
         if not path.endswith('.jpg'):
@@ -512,6 +514,42 @@ class Plotter:
         plt.bar(x, y, color=self.color(color), alpha=alpha)
         if xticks:
             plt.xticks(np.arange(1, len(x) + 1), xticks, rotation=90)
+        if save_path:
+            self.save(save_path, dpi)
+        plt.show()
+
+    def timeline(self,
+                 x,
+                 t,
+                 title='Timeline',
+                 xlabel='Time',
+                 ylabel='',
+                 save_path=None,
+                 dpi=500,
+                 color=None,
+                 alpha=1.,
+                 xlim=None,
+                 xscale=None):
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, xlim=xlim, size=(15, 1), background='white', grid=False)
+        xs = np.arange(1, t + 1)
+        ys = [0] * len(xs)
+        plt.plot(xs, ys, color='black')
+
+        xticks = [1] + list(np.arange(1, 100, 10) - 1)[1:]
+        if xticks[-1] != xs[-1]:
+            xticks.append(xs[-1])
+        print(xticks)
+        plt.xticks(xticks)
+
+        xs = [1, 17]
+        ys = [0] * len(xs)
+        plt.scatter(xs, ys, marker='|', s=500, color='green')
+
+        plt.xlabel('Time')
+
+        # remove yticks
+        frame1 = plt.gca()
+        frame1.axes.yaxis.set_ticklabels([])
         if save_path:
             self.save(save_path, dpi)
         plt.show()
