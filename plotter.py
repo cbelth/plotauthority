@@ -551,7 +551,7 @@ class Plotter:
                 x_to_c[_x] += 1
             x = sorted(set(x))
             m = max(x_to_c.values())
-            size = (15, m - 1 if m > 1 else 1)
+            size = (t, m)
         else:
             size = (15, 1)
 
