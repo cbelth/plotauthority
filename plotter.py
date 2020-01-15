@@ -29,6 +29,7 @@ class Plotter:
              xlim=None,
              ylim=None,
              grid=True,
+             top_line=True,
              background=(0.8588235294117647, 0.8588235294117647, 0.8588235294117647)):
         '''
         The main plot function. This is responsible for managing the plot.
@@ -38,7 +39,7 @@ class Plotter:
         :xlabel: The xlabel for the plot
         :ylabel: The ylabel for the plot
         '''
-        fig = plt.figure(figsize=size)
+        fig = plt.figure(figsize=size) 
         if xlim:
             plt.xlim(xlim)
         if ylim:
@@ -56,6 +57,9 @@ class Plotter:
         plt.rcParams['axes.facecolor'] = background
         if grid:
             plt.grid()
+        if not top_line:
+            ax = plt.gca()
+            ax.spines['top'].set_visible(False)
 
     def save(self, path, dpi=500, sns_plot=None):
         if not path.endswith('.jpg'):
@@ -169,14 +173,18 @@ class Plotter:
                         save_path=None,
                         dpi=500,
                         bins=10,
-                        labels=['first', 'second'],
+                        labels=None,
                         colors=None,
-                        alphas=[0.5, 0.5],
+                        alphas=None,
                         xscale=None,
                         yscale=None):
         self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale)
         #if not utils.check_args(values_list, colors, alphas):
         #    return
+        if not alphas:
+            alphas = [0.5] * len(values_list)
+        if not labels:
+            labels = list(str(i) for i in range(1, len(values_list) + 1))
         for i, values in enumerate(values_list):
             color = colors[i] if colors else i + 1
             plt.hist(values, bins=bins, edgecolor='black', color=self.color(color), alpha=alphas[i], label=labels[i])
@@ -529,22 +537,45 @@ class Plotter:
                  dpi=500,
                  color=None,
                  alpha=1.,
+                 interval=10,
+                 with_dots=False,
+                 with_last=True,
                  xlim=None,
                  xscale=None):
-        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, xlim=xlim, size=(15, 1), background='white', grid=False)
+        if color == None:
+            color = 'green'
+        if with_dots:
+            x_to_c = defaultdict(int)
+            for _x in x:
+                x_to_c[_x] += 1
+            x = sorted(set(x))
+            m = max(x_to_c.values())
+            size = (15, m - 1 if m > 1 else 1)
+        else:
+            size = (15, 1)
+
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, xlim=xlim, size=size, background='white', grid=False, top_line=False)
+        
         xs = np.arange(1, t + 1)
         ys = [0] * len(xs)
         plt.plot(xs, ys, color='black')
 
-        xticks = [1] + list(np.arange(1, 100, 10) - 1)[1:]
-        if xticks[-1] != xs[-1]:
+        xticks = [1] + list(np.arange(1, t + 1, interval) - 1)[1:]
+        if with_last and xticks[-1] != xs[-1]:
             xticks.append(xs[-1])
-        print(xticks)
         plt.xticks(xticks)
 
-        xs = [1, 17]
-        ys = [0] * len(xs)
-        plt.scatter(xs, ys, marker='|', s=500, color='green')
+        y = [0] * len(x)
+        plt.scatter(x, y, marker='|', s=500, color=color)
+
+        if with_dots:
+            x_dots = list()
+            y_dots = list()
+            for _x in x:
+                for c in range(1, x_to_c[_x] + 1):
+                    x_dots.append(_x)
+                    y_dots.append(c)
+            plt.scatter(x_dots, y_dots, marker='o', s=40, color=color)
 
         plt.xlabel('Time')
 
