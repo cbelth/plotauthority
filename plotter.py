@@ -539,6 +539,7 @@ class Plotter:
                  alpha=1.,
                  interval=10,
                  with_dots=False,
+                 top_line=True,
                  with_last=True,
                  xlim=None,
                  xscale=None):
@@ -554,7 +555,7 @@ class Plotter:
         else:
             size = (15, 1)
 
-        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, xlim=xlim, size=size, background='white', grid=False, top_line=False)
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, xlim=xlim, size=size, background='white', grid=False, top_line=top_line)
         
         xs = np.arange(1, t + 1)
         ys = [0] * len(xs)
