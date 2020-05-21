@@ -54,21 +54,22 @@ class Plotter:
 
         plt.xticks(fontsize=self.fontsize)
         plt.yticks(fontsize=self.fontsize)
-        plt.rcParams['axes.facecolor'] = background
+        if background != 'white':
+            plt.rcParams['axes.facecolor'] = background
         if grid:
             plt.grid()
         if not top_line:
             ax = plt.gca()
             ax.spines['top'].set_visible(False)
 
-    def save(self, path, dpi=500, sns_plot=None):
-        if not path.endswith('.jpg'):
-            print('Path to save should end in .jpg')
+    def save(self, path, dpi=500, sns_plot=None, transparent=False):
+        if not path.endswith('.jpg') and not path.endswith('.png'):
+            print('Path to save should end in .jpg or .png')
             return
         if sns_plot:
             sns_plot.savefig(path, format='jpg', dpi=dpi, bbox_inches='tight')
         else:
-            plt.savefig(path, format='jpg', dpi=dpi, bbox_inches='tight')
+            plt.savefig(path, format='jpg' if path.split('.')[-1] == 'jpg' else 'png', dpi=dpi, bbox_inches='tight', transparent=transparent)
 
     def color(self, given_color):
         if given_color:
@@ -259,19 +260,37 @@ class Plotter:
                save_path=None,
                dpi=500,
                color=None,
-               alpha=1.,
+               colors=None,
+               labels=None,
+               alpha=None,
                with_line=False,
                xlim=None,
                ylim=None,
+               size=None,
+               grid=True,
+               legend=False,
+               background='white',
+               linewidth=None,
+               transparent=False,
+               xticks=None,
+               yticks=None,
                xscale=None,
                yscale=None):
-        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim, grid=grid, background=background)
         if with_line:
-            plt.plot(x, y, '-o', color=self.color(color), alpha=alpha)
+            plt.scatter(x, y, color=self.color(colors), alpha=alpha, s=size)
+            plt.plot(x, y, '-', color=self.color(color), alpha=alpha, markersize=size, linewidth=linewidth)
         else:
-            plt.scatter(x, y, color=self.color(color), alpha=alpha)
+            scatter_plot = plt.scatter(x, y, color=self.color(colors), alpha=alpha, s=size)
+            if legend:
+                plt.legend(handles='l')
+        if xticks != None:
+            plt.xticks(xticks)
+        if yticks != None:
+            plt.yticks(yticks)
+
         if save_path:
-            self.save(save_path, dpi)
+            self.save(save_path, dpi, transparent=transparent)
         plt.show()
 
     def pdf(self,
@@ -360,6 +379,8 @@ class Plotter:
                          values,
                          title='Confusion Matrix',
                          cmap='inverted',
+                         xlabel=None,
+                         ylabel=None,
                          with_nums=False,
                          save_path=None,
                          dpi=500,
@@ -367,6 +388,7 @@ class Plotter:
                          vmin=None,
                          vmax=None):
         self.plot(title=title, ylabel='', xlabel='')
+        plt.xlabel(xlabel)
         sns.set(font_scale=3)
         sns_plot = sns.heatmap(values,
                     xticklabels=names,
@@ -460,21 +482,42 @@ class Plotter:
                         ylabel='f(x)',
                         save_path=None,
                         dpi=500,
-                        colors=[None, None],
-                        alpha=1.,
+                        colors=None,
+                        line_styles=None,
+                        legend=True,
+                        alpha=None,
                         with_line=False,
+                        background='white',
                         xlim=None,
                         ylim=None,
+                        size=None,
+                        xticks=None,
+                        yticks=None,
+                        ytick_labels=None,
+                        linewidth=None,
                         xscale=None,
                         yscale=None):
-        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim, background=background)
         if with_line:
-            for x, y, label, color in zip(xs, ys, labels, colors):
-                plt.plot(x, y, '-o', label=label, color=self.color('random') if not color else color, alpha=alpha)
+            if line_styles == None:
+                line_styles = ['-'] * len(colors)
+            for x, y, label, color, line_style in zip(xs, ys, labels, colors, line_styles):
+                if label == 'slope':
+                    plt.plot(x, y, '-', markersize=size, label=None, linewidth=linewidth, color=self.color('random') if not color else color, alpha=alpha, linestyle=line_style)
+                else:
+                    plt.plot(x, y, '-o', markersize=size, label=label, linewidth=linewidth, color=self.color('random') if not color else color, alpha=alpha, linestyle=line_style)
         else:
             for x, y, label, color in zip(xs, ys, labels, colors):
-                plt.scatter(x, y, label=label, color=self.color('random') if not color else color, alpha=alpha)
-        plt.legend(fontsize=30)
+                plt.scatter(x, y, s=size, label=label, color=self.color('random') if not color else color, alpha=alpha)
+        if xticks != None:
+            plt.xticks(xticks)
+        if yticks != None:
+            plt.yticks(yticks)
+            if ytick_labels != None:
+                plt.yticks(yticks, ytick_labels)
+
+        if legend:
+            plt.legend(fontsize=self.fontsize)
         if save_path:
             self.save(save_path, dpi)
         plt.show()
@@ -530,6 +573,7 @@ class Plotter:
     def timeline(self,
                  x,
                  t,
+                 start=1,
                  title='Timeline',
                  xlabel='Time',
                  ylabel='',
@@ -557,11 +601,11 @@ class Plotter:
 
         self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, xlim=xlim, size=size, background='white', grid=False, top_line=top_line)
         
-        xs = np.arange(1, t + 1)
+        xs = np.arange(start, t + 1)
         ys = [0] * len(xs)
         plt.plot(xs, ys, color='black')
 
-        xticks = [1] + list(np.arange(1, t + 1, interval) - 1)[1:]
+        xticks = [1] + list(np.arange(start, t + 1, interval) - 1)[1:]
         if with_last and xticks[-1] != xs[-1]:
             xticks.append(xs[-1])
         plt.xticks(xticks)
