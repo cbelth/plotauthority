@@ -43,7 +43,7 @@ class Plotter:
         if xlim:
             plt.xlim(xlim)
         if ylim:
-            plt.ylim(xlim)
+            plt.ylim(ylim)
         plt.title(title, fontsize=self.fontsize)
         plt.xlabel(xlabel, fontsize=self.fontsize)
         plt.ylabel(ylabel, fontsize=self.fontsize)
@@ -63,13 +63,13 @@ class Plotter:
             ax.spines['top'].set_visible(False)
 
     def save(self, path, dpi=500, sns_plot=None, transparent=False):
-        if not path.endswith('.jpg') and not path.endswith('.png'):
-            print('Path to save should end in .jpg or .png')
+        if not path.endswith('.jpg') and not path.endswith('.png') and not path.endswith('.pdf'):
+            print('Path to save should end in .jpg or .png or .pdf')
             return
         if sns_plot:
             sns_plot.savefig(path, format='jpg', dpi=dpi, bbox_inches='tight')
         else:
-            plt.savefig(path, format='jpg' if path.split('.')[-1] == 'jpg' else 'png', dpi=dpi, bbox_inches='tight', transparent=transparent)
+            plt.savefig(path, format=path.split('.')[-1], bbox_inches='tight', transparent=transparent)
 
     def color(self, given_color):
         if given_color:
@@ -487,7 +487,9 @@ class Plotter:
                         legend=True,
                         alpha=None,
                         with_line=False,
+                        markers=None,
                         background='white',
+                        grid=True,
                         xlim=None,
                         ylim=None,
                         size=None,
@@ -497,15 +499,14 @@ class Plotter:
                         linewidth=None,
                         xscale=None,
                         yscale=None):
-        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim, background=background)
+        self.plot(title=title, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim, grid=grid, background=background)
         if with_line:
             if line_styles == None:
                 line_styles = ['-'] * len(colors)
-            for x, y, label, color, line_style in zip(xs, ys, labels, colors, line_styles):
-                if label == 'slope':
-                    plt.plot(x, y, '-', markersize=size, label=None, linewidth=linewidth, color=self.color('random') if not color else color, alpha=alpha, linestyle=line_style)
-                else:
-                    plt.plot(x, y, '-o', markersize=size, label=label, linewidth=linewidth, color=self.color('random') if not color else color, alpha=alpha, linestyle=line_style)
+            if markers == None:
+                markers = ['-o'] * len(colors)
+            for x, y, label, color, line_style, marker in zip(xs, ys, labels, colors, line_styles, markers):
+                plt.plot(x, y, marker, markersize=size, label=label, linewidth=linewidth, color=self.color('random') if not color else color, alpha=alpha, linestyle=line_style)
         else:
             for x, y, label, color in zip(xs, ys, labels, colors):
                 plt.scatter(x, y, s=size, label=label, color=self.color('random') if not color else color, alpha=alpha)
